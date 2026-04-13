@@ -17,7 +17,7 @@ if st.button(" See Weather! 🔍"):
     if city:
         with st.spinner("Data is fetching ..."):
             try:
-                response = requests.get(f"http://127.0.0.1:5000/predict?city={city}")  # Flask API se connect kiya
+                response = requests.get(f"https://real-time-weather-prediction-system-4.onrender.com/predict?city={city}")  # Flask API se connect kiya
                 data = response.json()
 
                 if "error" in data:
