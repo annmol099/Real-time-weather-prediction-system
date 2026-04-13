@@ -9,3 +9,4 @@ plotly
 joblib
 flask-cors
 jupyter
+gunicorn
