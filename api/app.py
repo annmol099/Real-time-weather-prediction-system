@@ -4,12 +4,17 @@ import numpy as np
 import requests
 import pandas as pd
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)
 
+# Path Fix — Render + Local dono ke liye
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, '..', 'model', 'model.pkl')
+
 # Models Load Karo
-models = joblib.load("../model/model.pkl")
+models = joblib.load(MODEL_PATH)
 print("Models loaded! ✅")
 
 @app.route('/')
@@ -61,7 +66,7 @@ def predict():
         lat, lon
     ]])
 
-    # Forecast Predict Karo 4 din ka
+    # 4 Din Ka Forecast
     forecast = []
     for i in range(4):
         day_pred = {
@@ -87,4 +92,5 @@ def predict():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
