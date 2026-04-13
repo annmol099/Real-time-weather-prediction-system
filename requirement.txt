@@ -1,0 +1,12 @@
+# Add your dependencies here
+requests
+pandas
+numpy
+scikit-learn
+tensorflow
+flask
+streamlit
+plotly
+joblib
+flask-cors
+jupyter
