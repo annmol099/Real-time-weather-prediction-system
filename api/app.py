@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-import joblib
+import pickle
 import numpy as np
 import requests
 import pandas as pd
@@ -9,12 +9,18 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Path Fix — Render + Local dono ke liye
+# Path Fix
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, '..', 'model', 'model.pkl')
+LE_PATH = os.path.join(BASE_DIR, '..', 'model', 'label_encoder.pkl')
 
 # Models Load Karo
-models = joblib.load(MODEL_PATH)
+with open(MODEL_PATH, 'rb') as f:
+    models = pickle.load(f)
+
+with open(LE_PATH, 'rb') as f:
+    le = pickle.load(f)
+
 print("Models loaded! ✅")
 
 @app.route('/')
@@ -25,7 +31,7 @@ def home():
 def predict():
     city = request.args.get('city', 'Delhi')
 
-    # GeoCoding — koi bhi city
+    # GeoCoding
     geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json"
     geo_data = requests.get(geo_url).json()
 
@@ -60,10 +66,27 @@ def predict():
     temp = current["temperature"]
     now = pd.Timestamp.now()
 
+    # City Encode
+    try:
+        city_encoded = le.transform([city_name])[0]
+    except:
+        city_encoded = 0
+
+    # Features — naye order ke saath
     features = np.array([[
-        humidity, wind, pressure, rain, cloud,
-        now.hour, now.day, now.month, now.dayofweek,
-        lat, lon
+        city_encoded,
+        temp,
+        humidity,
+        wind,
+        cloud,
+        rain,
+        now.month,
+        now.day,
+        pressure,
+        now.hour,
+        now.dayofweek,
+        lat,
+        lon
     ]])
 
     # 4 Din Ka Forecast
@@ -74,8 +97,7 @@ def predict():
             "temp": round(float(models['temp'][i].predict(features)[0]), 1),
             "humidity": round(float(models['humidity'][i].predict(features)[0]), 1),
             "wind": round(float(models['wind'][i].predict(features)[0]), 1),
-            "rain": round(float(models['rain'][i].predict(features)[0]), 2),
-        }
+            "rain": max(0, round(float(models['rain'][i].predict(features)[0]), 2)),        }
         forecast.append(day_pred)
 
     return jsonify({

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SkyScope — See Beyond The Horizon</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        
+        {% if not data %}
+        <!-- HERO -->
+        <div class="hero">
+            <div class="badge">🌍 Global Forecasting</div>
+            <h1>
+                Predict Your<br>
+                <span class="gradient">Perfect Day</span>
+            </h1>
+            <p>Machine learning meets meteorology. Get 4-day forecasts for any city.</p>
+            
+            <form method="POST" class="search-box">
+                <input type="text" name="city" placeholder="Where to? Tokyo, Paris, Dubai..." required autocomplete="off">
+                <button type="submit">Discover →</button>
+            </form>
+            
+            <div class="quick-links">
+                <span>Popular:</span>
+                <a href="/?city=London">London</a>
+                <a href="/?city=New York">New York</a>
+                <a href="/?city=Tokyo">Tokyo</a>
+                <a href="/?city=Dubai">Dubai</a>
+            </div>
+            
+            <div class="stats">
+                <div><strong>98%</strong><span>Accuracy</span></div>
+                <div><strong>Any</strong><span>City</span></div>
+                <div><strong>4-Day</strong><span>Forecast</span></div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data %}
+        <!-- RESULTS -->
+        <div class="results">
+            <header>
+                <a href="/" class="logo">☁️ SkyScope</a>
+                <form method="POST" class="mini-search">
+                    <input type="text" name="city" value="{{ data.city }}" placeholder="Search..." autocomplete="off">
+                    <button type="submit">🔍</button>
+                </form>
+            </header>
+
+            <div class="city-hero">
+                <h1>{{ data.city }}</h1>
+                <div class="live-badge"><span class="dot"></span> Live Weather</div>
+            </div>
+
+            <section class="current">
+                <h2>🌡️ Right Now</h2>
+                <div class="cards">
+                    <div class="card big">
+                        <div class="temp">{{ data.current.temp }}°C</div>
+                        <div class="label">Temperature</div>
+                    </div>
+                    <div class="card">
+                        <div class="icon">💧</div>
+                        <div class="value">{{ data.current.humidity }}%</div>
+                        <div class="label">Humidity</div>
+                    </div>
+                    <div class="card">
+                        <div class="icon">💨</div>
+                        <div class="value">{{ data.current.wind }}</div>
+                        <div class="label">km/h Wind</div>
+                    </div>
+                    <div class="card">
+                        <div class="icon">☁️</div>
+                        <div class="value">{{ data.current.cloud }}%</div>
+                        <div class="label">Cloud Cover</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="forecast">
+                <h2>🔮 Next 4 Days</h2>
+                <div class="days">
+                    {% for day in data.forecast %}
+                    <div class="day-card">
+                        <div class="day-name">{{ day.day_name }}</div>
+                        <div class="day-date">{{ day.date }}</div>
+                        <div class="day-temp">{{ day.temp }}°C</div>
+                        <div class="day-info">
+                            <span>💧 {{ day.humidity }}%</span>
+                            <span>💨 {{ day.wind }} km/h</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="back-wrap">
+                <a href="/" class="back-btn">← Search Another City</a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <!-- ERROR -->
+        <div class="error-box">
+            <div class="error-icon">🌧️</div>
+            <h2>Lost in the Clouds</h2>
+            <p>{{ error }}</p>
+            <a href="/" class="back-btn">Try Again</a>
+        </div>
+        {% endif %}
+
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,2 +1,5 @@
-# model/
-# *.pkl
+model/
+.pkl
+# Large model artifacts
+model/model.pkl
+
